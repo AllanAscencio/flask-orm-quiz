@@ -1,11 +1,14 @@
-import pytest
 import json
+
+import pytest
+
 from api import create_app
+from api.lib.db import (close_db, drop_records, get_db, save, save_address,
+                        test_conn, test_cursor)
+from api.lib.orm import find
+from api.models.address import Address
 from api.models.business_entity_address import BusinessEntityAddress
 from api.models.person import Person
-from api.models.address import Address
-from api.lib.db import drop_records, get_db, close_db, test_conn, test_cursor, save, save_address
-from api.lib.orm import find
 from settings import TEST_DB_NAME
 
 
@@ -106,7 +109,7 @@ def test_person_with_address_returns_address_info_along_with_person(app, client)
     bob = find(test_cursor, Person, 15)
     response = client.get(f'/person/addresses/{bob.businessentityid}')
     person_with_addresses = json.loads(response.data)
-    # breakpoint()
+    
     assert person_with_addresses['businessentityid'] ==  15
     assert len(person_with_addresses['addresses']) ==  2
     assert person_with_addresses['addresses'][0]['addressline1'] == '123 romeo'
