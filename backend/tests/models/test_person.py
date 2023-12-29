@@ -2,10 +2,10 @@ from api.models.person import Person
 from api.lib.db import save, test_cursor, test_conn, drop_records
 import pytest
 
-def build_records(conn, cursor):
+def build_records(test_conn, test_cursor):
     for i in range(1, 3):
         sam = Person(firstname =f'Sam {i}', lastname = 'ok', businessentityid = i, persontype = 'EM')
-        save(sam, conn, cursor)
+        save(sam, test_conn, test_cursor)
 
 @pytest.fixture()
 def build_people():
@@ -39,11 +39,9 @@ def test_find_or_create_by_first_and_last_name_finds_the_related_person_if_alrea
     assert num_records == (2,)
 
 def test_find_or_create_by_first_and_last_name_creates_a_new_person_when_not_in_db(build_people):
-    person = Person.find_or_create_by_first_last_name_and_id(firstname = 'Sam 10', lastname = 'ok', 
-                                                             businessentityid = 3, conn = test_conn)
+    person = Person.find_or_create_by_first_last_name_and_id(firstname = 'Sam 10', lastname = 'ok', businessentityid = 3, conn = test_conn)
     assert person.firstname == 'Sam 10'
     assert person.lastname == 'ok'    
     test_cursor.execute('select count(*) from person.person')
     num_records = test_cursor.fetchone()
     assert num_records == (3,)
-

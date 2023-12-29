@@ -1,5 +1,5 @@
-from api.lib.orm import build_from_record
-from api.lib.db import save
+from api.lib.orm import build_from_record, find
+from api.lib.db import save, test_cursor, cursor, test_conn
 
 class Person:
     __table__ = 'person.person'
@@ -14,3 +14,13 @@ class Person:
         self.__dict__ = kwargs
 
     
+    @classmethod
+    def find_or_create_by_first_last_name_and_id(Class, firstname= '', lastname='', businessentityid='', conn=''):
+        person_found = find(test_cursor, Person, businessentityid)
+        if person_found == None:
+            create_person = Person(firstname = firstname, lastname= lastname, businessentityid= businessentityid)
+            save(create_person, test_conn, test_cursor)
+            return create_person
+        else:
+            return person_found
+            

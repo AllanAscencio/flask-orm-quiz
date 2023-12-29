@@ -5,10 +5,11 @@ import psycopg2
 from settings import TEST_DB_NAME, DB_NAME
 
 
-
-test_conn = psycopg2.connect(dbname = TEST_DB_NAME)
+test_conn = psycopg2.connect(dbname = TEST_DB_NAME, user='postgres', password='afrocs221994')
 test_cursor = test_conn.cursor()
 
+conn = psycopg2.connect(dbname = DB_NAME, user='postgres', password='afrocs221994')
+cursor = conn.cursor()
 
 
 def get_db():

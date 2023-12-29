@@ -14,10 +14,10 @@ from settings import TEST_DB_NAME
 
 @pytest.fixture(scope = 'module')
 def app():
-    flask_app = create_app(TEST_DB_NAME)
+    flask_app = create_app('adventureworks_test', 'postgres', 'afrocs221994')
 
     with flask_app.app_context():
-        conn = get_db()
+        conn = test_conn
         cursor = conn.cursor()
         drop_records(cursor, conn, 'person.person')
         drop_records(cursor, conn, 'person.address')
@@ -30,15 +30,16 @@ def app():
 
     with flask_app.app_context():
         close_db()
-        conn = get_db()
+        conn = test_conn
         cursor = conn.cursor()
         drop_records(cursor, conn, 'person.person')
         close_db()
 
+
 def build_records(conn, cursor):
     for i in range(1, 12):
         sam = Person(firstname =f'Sam {i}', lastname = 'ok', businessentityid = i, persontype = 'EM')
-        save(sam, conn, cursor)
+        save(sam, conn, cursor)  
     bob = Person(firstname =f'Bob', lastname = 'not ok', businessentityid = 15, persontype = 'EM')
     save(bob, conn, cursor)
     address = Address(addressid = 1,addressline1 = '123 romeo',
@@ -63,7 +64,6 @@ def build_records(conn, cursor):
                                  businessentityid = sam.businessentityid)
     save(bea3, conn, cursor)
     
-
 @pytest.fixture()
 def build_people():
     
@@ -109,8 +109,7 @@ def test_person_with_address_returns_address_info_along_with_person(app, client)
     bob = find(test_cursor, Person, 15)
     response = client.get(f'/person/addresses/{bob.businessentityid}')
     person_with_addresses = json.loads(response.data)
-    
     assert person_with_addresses['businessentityid'] ==  15
-    assert len(person_with_addresses['addresses']) ==  2
+    assert len(person_with_addresses['addresses']) ==  3
     assert person_with_addresses['addresses'][0]['addressline1'] == '123 romeo'
     
